@@ -30,9 +30,9 @@ Uses many .csv's from NHL.com/stats to build a summary data frame of skaters fro
 
 - <ins>Characters:</ins> Player
 - <ins>Factors:</ins> Season, Team, Shoots (left or right), Pos (position)
-- <ins>Numeric:</ins> GP (games played), G (goals), A (assists), P (points), PlusMinus, PIM (penalty minutes), P.PG (points/game) EVG (even strength goals), EVP (even strength points), PPG (power play goals), PPP (power play points), SHG (short handed goals), SHP (short handed points), OTG (overtime goals), GWG (game-winning goals), S (shots), S_Percent (shooting percentage), TOImin.GP ([time-on-ice in minutes]/game), FOW_Percent (faceoff win percentage), Traded_Status, Hits, Hits.60 (hits per 60 min), BkS (blocks), BK.60 (blocks per 60 min), GvA (giveaways), GvA.60 (giveaways per 60 min), TkA (takeaways), TkA.60 (takeaways per 60 min), Fp (yahoo fantasy points), Fp.GP (yahoo fantasy points per game)  
+- <ins>Numeric:</ins> GP (games played), G (goals), A (assists), P (points), PlusMinus, PIM (penalty minutes), P.PG (points/game), EVG (even strength goals), EVP (even strength points), PPG (power play goals), PPP (power play points), SHG (short handed goals), SHP (short handed points), OTG (overtime goals), GWG (game-winning goals), S (shots), S_Percent (shooting percentage), TOImin.GP ([time-on-ice in minutes]/game), FOW_Percent (faceoff win percentage), Traded_Status, Hits, Hits.60 (hits per 60 min), BkS (blocks), BK.60 (blocks per 60 min), GvA (giveaways), GvA.60 (giveaways per 60 min), TkA (takeaways), TkA.60 (takeaways per 60 min), Fp (yahoo fantasy points), Fp.GP (yahoo fantasy points per game)  
 
-### Usage
+### Usage & Output
 Example command line usage:
 ```sh
 Rscript WRITE_skaters_2020_2022.R
@@ -42,5 +42,5 @@ Produces output titled 'skaters_20_22_combined.csv'
 
 ## Roadmap
 Projects that are in the works:
-- <ins>Rising stars:</ins> Query skaters_20_22_combined.csv to investigate which players have improved the most in terms of Fp.GP between the two seasons. Do these players have anything in common? Do they play the same position? Were they traded to better teams or teams where they play a larger role on the ice? Pay attention to these players in the middle rounds of the draft after the league's top players have already been selected. A fantany manager who nails the second half of the draft can gain a substantial edge against the rest of his/her league.
+- <ins>Rising stars:</ins> Query skaters_20_22_combined.csv to investigate which players have improved the most in terms of Fp.GP between the two seasons. Do these players have anything in common? Do they play the same position? Were they traded to better teams or teams where they play a larger role on the ice? Pay attention to these players in the middle rounds of the next draft after the league's top players have already been selected. A fantany manager who nails the second half of the draft can gain a substantial edge against the rest of his/her league.
 - <ins>More to come!!</ins>
