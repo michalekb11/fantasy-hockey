@@ -1,14 +1,17 @@
-# URL below has a csv file with a little bit of current season team data
-# This script does not account for any postponed games upcoming in the schedule
+# FANTASY HOCKEY TEAM EVALUATION (WEEK BY WEEK)
 
-# https://shanemcd.org/2021/09/23/2021-22-nhl-schedule-and-results-in-excel-xlsx-and-csv-formats/
+# Here, we will web scrape an up-to-date NHL schedule and use this to generate a graphic describing 
+# what teams it would be optimal to acquire players from in fantasy hockey for any given upcoming week.
+# More specifically, we are interested in things such as:
+  # 1. How many games does each team play in the upcoming week? More games = More fantasy points.
+  # 2. How has each team performed recently? We will use their goal differential from the past few games to evaluate this.
+  # 3. What is the strength of their upcoming schedule? We will use the difference between the team's points and the 
+     # average points of their opponents for that week.
 
 #----------------------------------------------------------------------------------
 # USER INPUT
-  # Specify a directory + file name that you want input file saved in (downloaded from internet)
-dest <- "~/Documents/Fantasy/schedule.csv"
   # Specify directory you want output file saved in
-setwd("~/Documents/Fantasy")
+setwd("~/Documents/Fantasy_Hockey/most_valuable_teams")
   # The date range desired (the dates of the weekly match up)... Comes from command line arguments (ex: "2021-12-31 2022-1-6")
 args <- commandArgs(trailingOnly = TRUE)
 weekStart <- as.Date(args[1])
@@ -20,16 +23,25 @@ weekEnd <- as.Date(args[2])
 library(dplyr)
 library(ggplot2)
 library(ggrepel)
+library(rvest)
+library(RColorBrewer)
 
-  # download spreadsheet from internet
-url <- "https://shanemcd.org/wp-content/uploads/2021/09/nhl-202122-asplayed.csv"
-download.file(url = url, destfile = dest)
+  # Web scrape schedule from hockey reference
+url <- "https://www.hockey-reference.com/leagues/NHL_2023_games.html"
 
-  # read in data
-sched <- read.csv("schedule.csv")
+sched <- read_html(url) %>% 
+  html_node("table") %>% 
+  html_table() %>% 
+  na_if("")
+
+  # Clean up the data frame
+colnames(sched) <- c("Date", "Visitor", "v.Goals", "Home", "h.Goals", "Status", "Attendance", "LOG", "Notes")
 sched$Date <- as.Date(sched$Date)
 
-  # create different forms of date ranges we need later
+sched[!is.na(sched$v.Goals) & !is.na(sched$h.Goals) & !(sched$Status %in% "OT"), "Status"] <- "Regulation"
+sched[is.na(sched$Status), "Status"] <- "Scheduled"
+
+  # Create different forms of date ranges we need later
 dateRange <- seq(weekStart, weekEnd, by = "days")
 dateRange.written <- paste(format(weekStart, format = "%B %d"), format(weekEnd, format = "%B %d"), sep = " - ")
 dateRange.condensed <- paste(format(weekStart, format = "%m%d"), format(weekEnd, format = "%m%d"), sep = "_")
@@ -59,7 +71,7 @@ totalGames <- totalGames %>% arrange(desc(Total), desc(Home), desc(Away))
 # Team standings, total points
   # remove games that haven't been played, add winner column
 finished.games <- sched[!(sched$Status %in% c("Scheduled", "Postponed")), ]
-finished.games["Winner"] <- ifelse(finished.games$Score > finished.games$Score.1, "Visitor", "Home")
+finished.games["Winner"] <- ifelse(finished.games$v.Goals > finished.games$h.Goals, "Visitor", "Home")
 
   # calculate teams points
 team.list <- unique(c(sched$Visitor, sched$Home)) %>% sort()
@@ -68,12 +80,12 @@ names(team.points) <- team.list
 
 for(i in 1:nrow(finished.games)){
   winner.status <- finished.games$Winner[i]
-  winner.name <- finished.games[i, winner.status]
+  winner.name <- as.character(finished.games[i, winner.status])
   team.points[winner.name] <- team.points[winner.name] + 2
   
   if(finished.games$Status[i] != "Regulation"){
     OT.loser.status <- ifelse(winner.status == "Home", "Visitor", "Home")
-    OT.loser.name <- finished.games[i, OT.loser.status]
+    OT.loser.name <- as.character(finished.games[i, OT.loser.status])
     team.points[OT.loser.name] <- team.points[OT.loser.name] + 1
   }
 }
@@ -121,13 +133,18 @@ for(team in team.list){
   temp.df  <- finished.games[finished.games$Visitor == team | finished.games$Home == team, ] %>% arrange(Date)
   temp.df <- tail(temp.df, past.N.games)
   
+  if(nrow(temp.df) == 0){
+    goal.diff[team] <- 0
+    next
+  }
+  
   for(i in 1:nrow(temp.df)){
     if(temp.df$Visitor[i] == team){
-      goals.for <- goals.for + temp.df[i, "Score"]
-      goals.against <- goals.against + temp.df[i, "Score.1"]
+      goals.for <- goals.for + as.integer(temp.df[i, "v.Goals"])
+      goals.against <- goals.against + as.integer(temp.df[i, "h.Goals"])
     }else{
-      goals.for  <- goals.for + temp.df[i, "Score.1"]
-      goals.against <- goals.against + temp.df[i, "Score"]
+      goals.for  <- goals.for + as.integer(temp.df[i, "h.Goals"])
+      goals.against <- goals.against + as.integer(temp.df[i, "v.Goals"])
     }
   }
   
@@ -150,6 +167,9 @@ team.master.info <- merge(team.master.info, goal.diff, by = "Team")
   # make plot of recent goal differential (y) vs strength of schedule (x) 
   # color the plot based on the number of games the team plays in the upcoming date range
 #colors <- c("1" = "purple2", "2" = "red", "3" = "darkblue", "4" = "darkgreen", "5" = "cyan2")
+colors <- brewer.pal(4, "RdYlGn")
+names(colors) <- c("1", "2", "3", "4")
+colors["3"] <- "black"
 
 plot <- team.master.info %>% ggplot(aes(x = Strength.Differential, y = Goal.Differential, color = as.factor(Total))) + 
   geom_point() +
@@ -162,7 +182,8 @@ plot <- team.master.info %>% ggplot(aes(x = Strength.Differential, y = Goal.Diff
        title = paste("Most valuable teams:", dateRange.written), 
        color = "Number of upcoming games"
        ) +
-  #scale_color_manual(values = colors) +
+  #scale_color_brewer(type = "seq", palette = "YlGn") +
+  scale_color_manual(values = colors) + 
   theme(
     plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
     axis.title.x = element_text(size=14, face="bold"),    
