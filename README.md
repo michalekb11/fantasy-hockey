@@ -5,7 +5,7 @@ Required software: R
 Author: Bryan Michalek
 
 ## most_valuable_weekly_teams.R
-Uses a daily updated .csv of NHL matchup results (https://shanemcd.org/2021/09/23/2021-22-nhl-schedule-and-results-in-excel-xlsx-and-csv-formats/) to create a plot reflecting each team's goal differential in the past 4 games and the relative strength of their upcoming schedule (using team points). The corners of the plot correspond to:
+Web scrape a daily-updated table from the Hockey-Reference website containing NHL matchup results (https://www.hockey-reference.com/leagues/NHL_2023_games.html) to create a plot reflecting each team's goal differential in the past 4 games and the relative strength of their upcoming schedule (using team points). The quadrants of the plot correspond to:
 
 - <ins>Lower Left:</ins> On average worse than upcoming opponents and little recent success
 - <ins>Upper Left:</ins> On average worse than upcoming opponents but recent success
