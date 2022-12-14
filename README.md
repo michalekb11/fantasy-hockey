@@ -42,5 +42,5 @@ Produces output titled 'skaters_20_22_combined.csv'
 
 ## Roadmap
 Projects that are in the works:
-- <ins>Rising stars:</ins> Query skaters_20_22_combined.csv to investigate which players have improved the most in terms of Fp.GP between the two seasons. Do these players have anything in common? Do they play the same position? Were they traded to better teams or teams where they play a larger role on the ice? Pay attention to these players in the middle rounds of the next draft after the league's top players have already been selected. A fantany manager who nails the second half of the draft can gain a substantial edge against the rest of his/her league.
+- <ins>Rising stars:</ins> Query skaters_20_22_combined.csv to investigate which players have improved the most in terms of Fp.GP between the two seasons. Do these players have anything in common? Do they play the same position? Were they traded to better teams or teams where they play a larger role on the ice? Pay attention to these players in the middle rounds of the next draft after the league's top players have already been selected. A fantasy manager who nails the second half of the draft can gain a substantial edge against the rest of his/her league.
 - <ins>More to come!!</ins>
